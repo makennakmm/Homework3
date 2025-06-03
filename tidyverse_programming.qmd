@@ -1,0 +1,12 @@
+---
+title: "Tidyverse Programming"
+format: pdf
+editor: visual
+---
+
+```{r}
+#Requiring libraries
+library(tidyverse)
+library(palmerpenguins)
+```
+
