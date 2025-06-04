@@ -1,5 +1,5 @@
 ---
-title: "Tidyverse Programming"
+title: "Tidyverse Programming in R"
 format: pdf
 editor: visual
 ---
@@ -41,12 +41,12 @@ data2 #displaying the data
 
 \newpage
 
-## Task Two
+## Task Two: Trailblazer data
 
 ### Question a: Reading in the `trailblazer` data and using `glimpse` to check
 
 ```{r}
-trailblazer <- read_csv("data/trailblazer.csv") #using read_csv function to read in the data
+trailblazer <- read_csv("data/trailblazer.csv") #using read_csv function to read data
 
 glimpse(trailblazer) #glimpsing the data
 ```
@@ -56,9 +56,9 @@ glimpse(trailblazer) #glimpsing the data
 ```{r}
 trailblazer_longer <- trailblazer |> #starting with the original trailblazer dataset
   pivot_longer(cols = 2:11, #holding the Player column constant and pivoting the rest
-               names_to = "GameLocation", #creating a temporary combined column of Game and Location
+               names_to = "GameLocation", #temporary column of both Game and Location
                values_to = "Points") |>
-  #Splitting the combined GameLocation column into two separate columns using the "_" delimiter
+  #Splitting the temporary GameLocation column into two columns using the "_" delimiter
   separate_wider_delim(cols = GameLocation,
                         delim = "_",
                         names = c("Game", "Location"))
@@ -72,13 +72,15 @@ glimpse(trailblazer_longer) #looking at the data
 trailblazer_scoring <- trailblazer_longer |>
   pivot_wider(names_from = Location, values_from = Points) |> #Creating a 90 x4 dataset
   group_by(Player) |> #grouping by Player
-  mutate(mean_home = mean(Home, na.rm = TRUE)) |> #creating a column for mean home points
-  mutate(mean_away = mean(Away, na.rm = TRUE)) |> #creating a column for mean away points
-  mutate(mean_diff = mean_home - mean_away) |> #creating a column for the difference in home vs away points
+  mutate(mean_home = mean(Home, na.rm = TRUE)) |> #new column for mean home points
+  mutate(mean_away = mean(Away, na.rm = TRUE)) |> #new column for mean away points
+  mutate(mean_diff = mean_home - mean_away) |> #new column for points difference home-away
   arrange(desc(mean_diff)) #sorting by descending mean difference
 ```
 
 On average, Jusuf Nurkic, Robert Covington, Nassir Little, Damian Lillard and Cody Zeller scored more points in home games than away through the first 10 days. 
+
+\newpage
 
 ## Task Three: Manipulating the Penguins datasets
 
@@ -89,13 +91,12 @@ penguins <- penguins
 
 peng <- penguins |>
   select(species, island, bill_length_mm) |>
-  pivot_wider(names_from = island, values_from = bill_length_mm
-              )
+  pivot_wider(names_from = island, values_from = bill_length_mm)
 ```
 
-`NULL` means that there aren't any of that penguin species found on that island because the list of bill lengths is empty.
+`<NULL>` means that there aren't any of that penguin species found on that island because the list of bill lengths is empty.
 
-`dbl [52]>` means that the list contains 52 elements and that the data type of the elements is double. 
+`<dbl [52]>` means that the list contains 52 elements and that the data type of the elements is double. 
 
 `<list>` means that elements of the Torgersen, Biscoe, and Dream are list structures. 
 
@@ -103,17 +104,24 @@ peng <- penguins |>
 
 ```{r}
 penguins_correct <- penguins |>
-  select(species, island, bill_length_mm) |>
-  pivot_wider(names_from = island, values_from = bill_length_mm
-              )
+  select(species, island) |> #selecting relevant columns
+  group_by(species, island) |> #grouping by species and island
+  summarise(n = n()) |> #creating a count column called n
+  pivot_wider(names_from = island, values_from = n) |> #pivoting to a wide dataset
+  mutate(across(where(is.numeric), coalesce, 0)) #converting NA values to 0 using coalesce
+
+penguins_correct
 ```
+
+\newpage
 
 ## Task Four: Replacing `NA` values in the penguins dataset
 
 ```{r}
 penguins |>
-  mutate(bill_length_mm = case_when(is.na(bill_length_mm) & species == "Adelie" ~ 26,
-                   is.na(bill_length_mm) & species == "Gentoo" ~ 30,
-                   TRUE ~ bill_length_mm)) |>
-  arrange(bill_length_mm)
+  mutate(bill_length_mm = 
+           case_when(is.na(bill_length_mm) & species == "Adelie" ~ 26, #Adelie NA value
+                     is.na(bill_length_mm) & species == "Gentoo" ~ 30, #Gentoo NA value
+                     TRUE ~ bill_length_mm)) |> #all other rows keep the bill length value
+  arrange(bill_length_mm) #sorting by ascending bill length
 ```
