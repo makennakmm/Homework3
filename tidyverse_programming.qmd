@@ -70,14 +70,38 @@ glimpse(trailblazer_longer) #looking at the data
 
 ```{r}
 trailblazer_scoring <- trailblazer_longer |>
-  pivot_wider(names_from = Location, values_from = Points) |>
-  group_by(Player) |>
-  mutate(mean_home = mean(Home, na.rm = TRUE)) |>
-  mutate(mean_away = mean(Away, na.rm = TRUE)) |>
-  mutate(mean_diff = mean_home - mean_away) |>
-  arrange(desc(mean_diff))
+  pivot_wider(names_from = Location, values_from = Points) |> #Creating a 90 x4 dataset
+  group_by(Player) |> #grouping by Player
+  mutate(mean_home = mean(Home, na.rm = TRUE)) |> #creating a column for mean home points
+  mutate(mean_away = mean(Away, na.rm = TRUE)) |> #creating a column for mean away points
+  mutate(mean_diff = mean_home - mean_away) |> #creating a column for the difference in home vs away points
+  arrange(desc(mean_diff)) #sorting by descending mean difference
 ```
 
 On average, Jusuf Nurkic, Robert Covington, Nassir Little, Damian Lillard and Cody Zeller scored more points in home games than away through the first 10 days. 
 
-## Task Three: 
+## Task Three: Manipulating the Penguins datasets
+
+### Question a: Reviewing a coworker's data pivot
+
+```{r, include=FALSE}
+penguins <- penguins
+
+peng <- penguins |>
+  select(species, island, bill_length_mm) |>
+  pivot_wider(names_from = island, values_from = bill_length_mm
+              )
+```
+
+`NULL` means that there aren't any of that penguin species found on that island because the list of bill lengths is empty.
+
+`dbl [52]>` means that the list contains 52 elements and that the data type of the elements is double. 
+
+`<list>` means that elements of the Torgersen, Biscoe, and Dream are list structures. 
+
+### Question b: Creating the correct penguins data table
+
+```{r}
+
+```
+
