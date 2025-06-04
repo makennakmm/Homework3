@@ -102,6 +102,18 @@ peng <- penguins |>
 ### Question b: Creating the correct penguins data table
 
 ```{r}
-
+penguins_correct <- penguins |>
+  select(species, island, bill_length_mm) |>
+  pivot_wider(names_from = island, values_from = bill_length_mm
+              )
 ```
 
+## Task Four: Replacing `NA` values in the penguins dataset
+
+```{r}
+penguins |>
+  mutate(bill_length_mm = case_when(is.na(bill_length_mm) & species == "Adelie" ~ 26,
+                   is.na(bill_length_mm) & species == "Gentoo" ~ 30,
+                   TRUE ~ bill_length_mm)) |>
+  arrange(bill_length_mm)
+```
