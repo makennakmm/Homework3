@@ -10,9 +10,11 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
+\newpage
+
 ## Task One: Reading in the data
 
-### Question One: Reading in `data.txt` file
+### Question a: Reading in `data.txt` file
 
 ```{r}
 ?read_csv
@@ -21,19 +23,61 @@ library(palmerpenguins)
 CSV stands for Comma Separated Values. The data contained in the file data.txt are not comma delimited (they are semicolon delimited), so therefore we cannot use the function read_csv to read in this data file. 
 
 ```{r}
-data <- read_delim("data/data.txt", 
-                   delim = "; ", 
-                   col_types = "ddd"
+data <- read_delim("data/data.txt", #name and path of the data file
+                   delim = "; ", #setting "; " as the delimiter
+                   col_types = "ddd" #assigning all columns as double
                    )
-data
+data #displaying the data
 ```
 
-### Question Two: Reading in `data2.txt` file
+### Question b: Reading in `data2.txt` file
 
 ```{r}
-data2 <- read_delim("data/data2.txt", 
-                   delim = "6", 
-                   col_types = "fdc")
-data2
+data2 <- read_delim("data/data2.txt", #name and path of the data file
+                   delim = "6", #setting "6" as the delimiter
+                   col_types = "fdc") #assigning columns as x=factor, y=double, z=character
+data2 #displaying the data
 ```
 
+\newpage
+
+## Task Two
+
+### Question a: Reading in the `trailblazer` data and using `glimpse` to check
+
+```{r}
+trailblazer <- read_csv("data/trailblazer.csv") #using read_csv function to read in the data
+
+glimpse(trailblazer) #glimpsing the data
+```
+
+### Question b: Pivoting the data
+
+```{r}
+trailblazer_longer <- trailblazer |> #starting with the original trailblazer dataset
+  pivot_longer(cols = 2:11, #holding the Player column constant and pivoting the rest
+               names_to = "GameLocation", #creating a temporary combined column of Game and Location
+               values_to = "Points") |>
+  #Splitting the combined GameLocation column into two separate columns using the "_" delimiter
+  separate_wider_delim(cols = GameLocation,
+                        delim = "_",
+                        names = c("Game", "Location"))
+
+glimpse(trailblazer_longer) #looking at the data
+```
+
+### Question c: Finding whether players scored more during home or away games
+
+```{r}
+trailblazer_scoring <- trailblazer_longer |>
+  pivot_wider(names_from = Location, values_from = Points) |>
+  group_by(Player) |>
+  mutate(mean_home = mean(Home, na.rm = TRUE)) |>
+  mutate(mean_away = mean(Away, na.rm = TRUE)) |>
+  mutate(mean_diff = mean_home - mean_away) |>
+  arrange(desc(mean_diff))
+```
+
+On average, Jusuf Nurkic, Robert Covington, Nassir Little, Damian Lillard and Cody Zeller scored more points in home games than away through the first 10 days. 
+
+## Task Three: 
