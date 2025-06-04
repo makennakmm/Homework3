@@ -10,3 +10,30 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
+## Task One: Reading in the data
+
+### Question One: Reading in `data.txt` file
+
+```{r}
+?read_csv
+```
+
+CSV stands for Comma Separated Values. The data contained in the file data.txt are not comma delimited (they are semicolon delimited), so therefore we cannot use the function read_csv to read in this data file. 
+
+```{r}
+data <- read_delim("data/data.txt", 
+                   delim = "; ", 
+                   col_types = "ddd"
+                   )
+data
+```
+
+### Question Two: Reading in `data2.txt` file
+
+```{r}
+data2 <- read_delim("data/data2.txt", 
+                   delim = "6", 
+                   col_types = "fdc")
+data2
+```
+
